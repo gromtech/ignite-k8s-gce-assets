@@ -1,0 +1,33 @@
+apiVersion: apps/v1beta2
+kind: Deployment
+metadata:
+  name: web-agent
+  namespace: default
+spec:
+  selector:
+    matchLabels:
+      app: web-agent
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: web-agent
+    spec:
+      serviceAccountName: ignite
+      containers:
+      - name: web-agent
+        image: gromtech/ignite-web-agent:2.5.0.20180522
+        resources:
+          limits:
+            cpu: 500m 
+            memory: 1000Mi
+        env:
+        - name: DRIVER_FOLDER
+          value: "./jdbc-drivers"
+        - name: NODE_URI
+          value: "http://ignite.default.svc.cluster.local:8080"
+        - name: SERVER_URI
+          value: "http://web-console.default.svc.cluster.local"
+        - name: TOKENS
+          value: "AWwoizQZnS06wHygGWDc"
+

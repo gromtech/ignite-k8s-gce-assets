@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+    Configuration example with Kubernetes IP finder enabled.
+
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd">
+   <bean id="ignite.cfg" class="org.apache.ignite.configuration.IgniteConfiguration">
+      <property name="workDirectory" value="#{ systemEnvironment['WORKDIR'] }" />
+      <property name="cacheConfiguration">
+         <list>
+            <bean class="org.apache.ignite.configuration.CacheConfiguration">
+               <property name="name" value="SimpleCache" />
+               <property name="cacheMode" value="PARTITIONED" />
+               <property name="backups" value="1" />
+               <property name="statisticsEnabled" value="true" />
+            </bean>
+         </list>
+      </property>
+      <!-- Enabling Apache Ignite native persistence. -->
+      <property name="dataStorageConfiguration">
+         <bean class="org.apache.ignite.configuration.DataStorageConfiguration">
+            <property name="defaultDataRegionConfiguration">
+               <bean class="org.apache.ignite.configuration.DataRegionConfiguration">
+                  <property name="persistenceEnabled" value="true" />
+                  <property name="name" value="Default_Region"/>
+                  <!-- Setting the size of the default region to 300 MB. -->
+                  <property name="maxSize" value="#{300L * 1024 * 1024}"/>
+                  <!-- Setting the checkpoint buffer size to 100 MB. -->
+                  <property name="checkpointPageBufferSize" value="#{100L * 1024 * 1024}"/>
+               </bean>
+            </property>
+         </bean>
+      </property>
+
+      <property name="discoverySpi">
+         <bean class="org.apache.ignite.spi.discovery.tcp.TcpDiscoverySpi">
+            <property name="ipFinder">
+               <bean class="org.apache.ignite.spi.discovery.tcp.ipfinder.kubernetes.TcpDiscoveryKubernetesIpFinder">
+                  <property name="namespace" value="#{ systemEnvironment['NAMESPACE'] }" />
+                  <property name="serviceName" value="#{ systemEnvironment['SERVICENAME'] }"/>
+               </bean>
+            </property>
+         </bean>
+      </property>
+   </bean>
+</beans>

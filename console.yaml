@@ -1,0 +1,35 @@
+apiVersion: apps/v1beta2
+kind: Deployment
+metadata:
+  name: web-console
+  namespace: default
+spec:
+  selector:
+    matchLabels:
+      app: web-console
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: web-console
+    spec:
+      serviceAccountName: ignite
+      volumes:
+      - name: console-volume
+        persistentVolumeClaim:
+          claimName: console-volume
+      containers:
+      - name: web-console
+        image: gromtech/web-console-standalone:2.5.0.20180522
+        resources:
+          limits:
+            cpu: 500m 
+            memory: 1000Mi
+        env:
+        - name: mail_service
+          value: ""
+        ports:
+        - containerPort: 80
+        volumeMounts:
+        - mountPath: "/data/db"
+          name: console-volume

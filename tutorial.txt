@@ -1,0 +1,63 @@
+1. Grant cluster-admin role to current google user (to allow create roles):
+
+$ kubectl create clusterrolebinding myname2-cluster-admin-binding \
+  --clusterrole=cluster-admin \
+  --user=<email>
+
+2. Create service account and grant permissions:
+
+$ kubectl create -f sa.yaml
+$ kubectl create -f role.yaml
+$ kubectl create -f rolebind.yaml
+
+3. Create a grid service:
+
+$ kubectl create -f service.yaml
+
+4. Deploy Ignite cluster:
+
+$ kubectl create -f grid.yaml
+
+-----------------------------------
+
+5. Deploy Ignite StatefulSet cluster with enable Persistence (instead of step 4).
+
+$ kubectl create -f grid-pds.yaml
+
+6. Connect to the Ignite node POD and activate cluster:
+
+$ kubectl exec -it ignite-cluster-0 -- /bin/bash
+
+$ cd /opt/ignite/apache-ignite-*
+$ ./bin/control.sh --activate
+
+-----------------------------------
+
+## Deploy web console:
+
+7. Create a volume to keep web console data:
+
+$ kubectl create -f console-volume.yaml
+
+8. Create load balancer to expose http port of web console:
+
+$ kubectl create -f console-service.yaml
+
+9. Deploy Web Console:
+
+$ kubectl create -f console.yaml
+
+10. Check external IP of web console:
+
+$ kubectl get service web-console
+
+11. Open Web Console in browser and Sign Up.
+
+12. Move to User Profile page (Settings > Profile) and copy security token.
+
+13. Insert security token into web-agent.yaml (TOKENS environment variable).
+
+14. Deploy Web Agent:
+
+$ kubectl create -f web-agent.yaml
+
